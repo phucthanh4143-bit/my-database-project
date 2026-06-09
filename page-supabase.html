@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Todo - Supabase | Quản lý công việc thời gian thực</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        .nav {
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Main Card */
+        .todo-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .todo-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-left: 4px solid #43e97b;
+            padding-left: 15px;
+        }
+
+        /* Add Todo Form */
+        .add-todo-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .add-todo-form input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .add-todo-form input:focus {
+            outline: none;
+            border-color: #43e97b;
+            box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.1);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Todo List */
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border-left: 4px solid #43e97b;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-info {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .todo-status {
+            display: inline-block;
+            background: #43e97b20;
+            color: #2e7d32;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .todo-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn:hover {
+            background: #e84118;
+            transform: scale(1.05);
+        }
+
+        /* Loading & Empty States */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #43e97b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        /* Stats */
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .add-todo-form {
+                flex-direction: column;
+            }
+            
+            .todo-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .delete-btn {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="index.html" class="back-btn">
+                ← Quay lại Dashboard
+            </a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>⚡ Quản lý Công việc (Todo)</h1>
+            <p>Dữ liệu được đồng bộ thời gian thực với Supabase Cloud</p>
+        </div>
+
+        <!-- Alert Message -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Main Todo Card -->
+        <div class="todo-card">
+            <h2>📝 Thêm công việc mới</h2>
+            <div class="add-todo-form">
+                <input type="text" id="todoTitle" placeholder="Nhập tên công việc cần làm..." autocomplete="off">
+                <button class="btn-add" id="addTodoBtn">
+                    ➕ Thêm việc
+                </button>
+            </div>
+
+            <h2>📋 Danh sách công việc</h2>
+            <div id="todoListContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Đang tải danh sách công việc từ Supabase...</p>
+                </div>
+            </div>
+
+            <div class="stats" id="stats">
+                Đang tải...
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS SDK (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ==================== THAY BẰNG THÔNG SỐ THẬT CỦA BẠN ====================
+        const SUPABASE_URL = 'https://cpkvaaiavocscjrzohku.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNwa3ZhYWlhdm9jc2NqcnpvaGt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NTU2ODAsImV4cCI6MjA5NjUzMTY4MH0._Xlx85TzFeLfhdQePcist_FEBJjUgp7yMUs-2CaBJbs';
+        // ======================================================================
+
+        // Khởi tạo Supabase client (đặt tên khác để tránh conflict với biến CDN)
+        // Lưu ý: window.supabase là từ CDN, không nên đặt trùng tên [citation:3]
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // DOM elements
+        const todoListContainer = document.getElementById('todoListContainer');
+        const addBtn = document.getElementById('addTodoBtn');
+        const todoInput = document.getElementById('todoTitle');
+        const alertDiv = document.getElementById('alert');
+        const statsDiv = document.getElementById('stats');
+
+        // Helper: Hiển thị thông báo
+        function showAlert(message, type = 'success') {
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            setTimeout(() => {
+                alertDiv.className = 'alert';
+                alertDiv.textContent = '';
+            }, 3000);
+        }
+
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Helper: Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Vừa tạo';
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000 / 60); // phút
+                
+                if (diff < 1) return 'Vừa xong';
+                if (diff < 60) return `${diff} phút trước`;
+                if (diff < 1440) return `${Math.floor(diff / 60)} giờ trước`;
+                return date.toLocaleDateString('vi-VN');
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Function: Load todos từ Supabase
+        async function loadTodos() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('todos')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                displayTodos(data || []);
+                updateStats(data || []);
+                return data;
+            } catch (error) {
+                console.error('Lỗi load todos:', error);
+                showAlert('Không thể tải danh sách công việc!', 'error');
+                todoListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>❌ Lỗi kết nối Supabase</p>
+                        <p style="font-size: 0.85rem; margin-top: 10px;">Kiểm tra lại SUPABASE_URL và SUPABASE_ANON_KEY</p>
+                    </div>
+                `;
+                return [];
+            }
+        }
+
+        // Function: Hiển thị todos
+        function displayTodos(todos) {
+            if (!todos || todos.length === 0) {
+                todoListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>📭 Chưa có công việc nào. Hãy thêm công việc đầu tiên!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = todos.map(todo => `
+                <li class="todo-item" data-id="${todo.id}">
+                    <div class="todo-info">
+                        <div class="todo-title">${escapeHtml(todo.title)}</div>
+                        <div>
+                            <span class="todo-status">📌 ${escapeHtml(todo.status || 'Mới')}</span>
+                        </div>
+                        <div class="todo-time">🕒 ${formatDate(todo.created_at)}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTodo('${todo.id}')">
+                        🗑️ Xóa
+                    </button>
+                </li>
+            `).join('');
+            
+            todoListContainer.innerHTML = `<ul style="list-style: none;">${html}</ul>`;
+        }
+
+        // Function: Cập nhật thống kê
+        function updateStats(todos) {
+            const newCount = todos.filter(t => (t.status || 'Mới') === 'Mới').length;
+            const total = todos.length;
+            statsDiv.innerHTML = `
+                📊 Tổng số: ${total} công việc | ✨ Mới: ${newCount}
+            `;
+        }
+
+        // Function: Thêm todo mới
+        async function addTodo(title) {
+            if (!title.trim()) {
+                showAlert('Vui lòng nhập nội dung công việc!', 'error');
+                return false;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('todos')
+                    .insert([{ title: title.trim(), status: 'Mới' }])
+                    .select();
+                
+                if (error) throw error;
+                
+                showAlert('Thêm công việc thành công!', 'success');
+                todoInput.value = '';
+                await loadTodos(); // Reload lại danh sách
+                return true;
+            } catch (error) {
+                console.error('Lỗi insert:', error);
+                showAlert('Không thể thêm công việc. Vui lòng thử lại!', 'error');
+                return false;
+            }
+        }
+
+        // Function: Xóa todo (global để gọi từ onclick)
+        window.deleteTodo = async function(id) {
+            if (!confirm('Bạn có chắc muốn xóa công việc này?')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('todos')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showAlert('Đã xóa công việc!', 'success');
+                await loadTodos(); // Reload danh sách
+            } catch (error) {
+                console.error('Lỗi delete:', error);
+                showAlert('Không thể xóa công việc. Vui lòng thử lại!', 'error');
+            }
+        };
+
+        // Event listeners
+        addBtn.addEventListener('click', () => addTodo(todoInput.value));
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo(todoInput.value);
+        });
+
+        // Kiểm tra cấu hình
+        if (SUPABASE_URL.includes('YOUR_PROJECT_REF') || SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY')) {
+            todoListContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>⚠️ <strong>Chưa cấu hình Supabase!</strong></p>
+                    <p>Vui lòng:</p>
+                    <ol style="text-align: left; display: inline-block; margin-top: 10px;">
+                        <li>Tạo project trên Supabase</li>
+                        <li>Chạy SQL tạo bảng todos</li>
+                        <li>Lấy URL và anon key từ Project Settings → API</li>
+                        <li>Thay vào biến SUPABASE_URL và SUPABASE_ANON_KEY</li>
+                    </ol>
+                </div>
+            `;
+            statsDiv.innerHTML = '⚠️ Chưa cấu hình kết nối Supabase';
+        } else {
+            // Khởi tạo: load todos ngay khi trang load
+            loadTodos();
+        }
+    </script>
+</body>
+</html>

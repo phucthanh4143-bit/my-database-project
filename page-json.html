@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Quotes - Câu nói truyền cảm hứng</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        .nav {
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        /* Main Card */
+        .quote-card {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quote-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .quote-text {
+            font-size: 1.8rem;
+            line-height: 1.4;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 500;
+            quotes: "“" "”" "‘" "’";
+        }
+
+        .quote-text::before {
+            content: "“";
+            font-size: 3rem;
+            color: #f5576c;
+            opacity: 0.5;
+            margin-right: 5px;
+        }
+
+        .quote-text::after {
+            content: "”";
+            font-size: 3rem;
+            color: #f5576c;
+            opacity: 0.5;
+            margin-left: 5px;
+            vertical-align: top;
+        }
+
+        .quote-author {
+            font-size: 1.2rem;
+            color: #f5576c;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .quote-author::before {
+            content: "— ";
+        }
+
+        /* Button */
+        .random-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .random-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        .random-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Info & Stats */
+        .info {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error {
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quote-card {
+                padding: 30px 20px;
+            }
+            
+            .quote-text {
+                font-size: 1.3rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="index.html" class="back-btn">
+                ← Quay lại Dashboard
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Đang tải những câu nói truyền cảm hứng...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to store quotes data
+        let quotesData = [];
+        let currentQuote = null;
+
+        // DOM elements
+        const mainContent = document.getElementById('mainContent');
+
+        // Function to fetch JSON data
+        async function fetchQuotes() {
+            try {
+                const response = await fetch('data.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!Array.isArray(data) || data.length === 0) {
+                    throw new Error('Dữ liệu JSON không hợp lệ hoặc rỗng');
+                }
+                
+                quotesData = data;
+                return true;
+            } catch (error) {
+                console.error('Lỗi khi đọc file JSON:', error);
+                return false;
+            }
+        }
+
+        // Function to get random quote
+        function getRandomQuote() {
+            if (!quotesData.length) return null;
+            const randomIndex = Math.floor(Math.random() * quotesData.length);
+            return quotesData[randomIndex];
+        }
+
+        // Function to render quote
+        function renderQuote(quote) {
+            if (!quote) return;
+            
+            currentQuote = quote;
+            
+            const html = `
+                <div class="quote-card">
+                    <div class="quote-icon">💭</div>
+                    <div class="quote-text">${escapeHtml(quote.quote)}</div>
+                    <div class="quote-author">${escapeHtml(quote.author)}</div>
+                    <button class="random-btn" onclick="loadRandomQuote()">
+                        🔄 Câu khác ngẫu nhiên
+                    </button>
+                </div>
+                <div class="info">
+                    <div class="stats">
+                        <div class="stat-item">📚 Tổng số câu: ${quotesData.length}</div>
+                        <div class="stat-item">✨ Câu hiện tại: #${quotesData.indexOf(currentQuote) + 1}</div>
+                    </div>
+                    <div class="warning">
+                        💡 Mẹo: Mỗi lần click vào nút, bạn sẽ nhận được một câu nói ngẫu nhiên!
+                    </div>
+                </div>
+            `;
+            
+            mainContent.innerHTML = html;
+        }
+
+        // Function to show error
+        function showError(message) {
+            const html = `
+                <div class="error">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+                    <h3>Lỗi tải dữ liệu</h3>
+                    <p>${message}</p>
+                    <button class="random-btn" onclick="location.reload()" style="margin-top: 20px;">
+                        🔄 Thử lại
+                    </button>
+                    <div style="margin-top: 20px; font-size: 0.9rem;">
+                        <p><strong>Lưu ý:</strong> Bạn cần chạy trang này bằng <strong>Live Server</strong> trên VS Code!</p>
+                        <p>Hoặc đảm bảo file <strong>data.json</strong> tồn tại cùng thư mục.</p>
+                    </div>
+                </div>
+            `;
+            mainContent.innerHTML = html;
+        }
+
+        // Function to load random quote (public for button click)
+        window.loadRandomQuote = function() {
+            if (!quotesData.length) {
+                showError('Chưa có dữ liệu câu nói. Vui lòng tải lại trang!');
+                return;
+            }
+            
+            const randomQuote = getRandomQuote();
+            renderQuote(randomQuote);
+        };
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize app
+        async function init() {
+            const success = await fetchQuotes();
+            
+            if (success && quotesData.length > 0) {
+                // Display random quote on load
+                const randomQuote = getRandomQuote();
+                renderQuote(randomQuote);
+            } else {
+                showError('Không thể tải file data.json. Vui lòng kiểm tra lại!');
+            }
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống 3 Trong 1 | Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        /* Grid Layout */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .card-header .emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .card-content {
+            padding: 25px;
+            background: white;
+        }
+
+        .card-content p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .card-features li {
+            padding: 8px 0;
+            color: #666;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-features li::before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-align: center;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Card specific header colors */
+        .card-json .card-header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .card-sheets .card-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .card-supabase .card-header { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            body {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Hệ Thống 3 Trong 1</h1>
+            <p>Giải pháp quản lý dữ liệu đa nền tảng | JSON | Google Sheets | Supabase</p>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+            
+            <!-- Card 1: App Quotes (JSON) -->
+            <a href="page-json.html" class="card card-json">
+                <div class="card-header">
+                    <div class="emoji">📖💬</div>
+                    <h2>App Quotes</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>Ứng dụng đọc câu nói truyền cảm hứng từ file JSON</strong></p>
+                    <ul class="card-features">
+                        <li>Tự động tải dữ liệu từ file JSON</li>
+                        <li>Hiển thị ngẫu nhiên câu nói mỗi lần tải trang</li>
+                        <li>Nút "Câu khác" - bốc ngẫu nhiên không giới hạn</li>
+                        <li>10+ câu nói ý nghĩa từ nhiều tác giả nổi tiếng</li>
+                    </ul>
+                    <div class="btn">📖 Khám phá ngay →</div>
+                </div>
+            </a>
+
+            <!-- Card 2: Form Feedback (Google Sheets) -->
+            <a href="page-sheets.html" class="card card-sheets">
+                <div class="card-header">
+                    <div class="emoji">📊📝</div>
+                    <h2>Form Feedback</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>Thu thập và quản lý góp ý với Google Sheets</strong></p>
+                    <ul class="card-features">
+                        <li>Gửi góp ý trực tiếp lên Google Sheets qua API</li>
+                        <li>Tải danh sách góp ý từ Sheet về hiển thị</li>
+                        <li>Form nhập liệu với Họ tên, Email, Nội dung</li>
+                        <li>Dữ liệu lưu trữ an toàn trên Google Drive</li>
+                    </ul>
+                    <div class="btn">📊 Gửi góp ý →</div>
+                </div>
+            </a>
+
+            <!-- Card 3: App Todo (Supabase) -->
+            <a href="page-supabase.html" class="card card-supabase">
+                <div class="card-header">
+                    <div class="emoji">⚡✅</div>
+                    <h2>App Todo</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>Quản lý công việc thời gian thực với Supabase</strong></p>
+                    <ul class="card-features">
+                        <li>Thêm công việc mới - tự động lưu lên cloud</li>
+                        <li>Xóa công việc với nút thùng rác</li>
+                        <li>Dữ liệu đồng bộ theo thời gian thực</li>
+                        <li>Tích hợp Supabase với RLS và UUID</li>
+                    </ul>
+                    <div class="btn">⚡ Quản lý việc →</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🎯 Bài tập tổng hợp: HTML + CSS + JavaScript + API Integration</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">JSON | Google Sheets API | Supabase (PostgreSQL)</p>
+        </div>
+    </div>
+</body>
+</html>
